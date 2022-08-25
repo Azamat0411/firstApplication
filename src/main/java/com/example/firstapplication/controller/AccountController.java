@@ -1,7 +1,9 @@
 package com.example.firstapplication.controller;
 
 import com.example.firstapplication.model.Account;
+import com.example.firstapplication.model.Application;
 import com.example.firstapplication.repository.AccountRepository;
+import com.example.firstapplication.repository.ApplicationRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -10,11 +12,13 @@ import java.util.*;
 @RequestMapping("/api")
 public class AccountController {
 
-    public AccountController(AccountRepository accountRepository) {
+    public AccountController(AccountRepository accountRepository, ApplicationRepository applicationRepository) {
         this.accountRepository = accountRepository;
+        this.applicationRepository = applicationRepository;
     }
 
     private final AccountRepository accountRepository;
+    private final ApplicationRepository applicationRepository;
 
     @GetMapping("/account")
     public Map<String, Object> getAccounts() {
@@ -165,4 +169,48 @@ public class AccountController {
             return response;
         }
     }
+
+    @GetMapping("/application")
+    public Map<String, Object> getApplication(){
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", true);
+        response.put("application", applicationRepository.findAll());
+        return response;
+    }
+
+    @PostMapping("/application")
+    public Map<String, Object> createApplication(@RequestBody Application body){
+        Map<String, Object> response = new LinkedHashMap<>();
+        if(body.getTitle().isEmpty()){
+            response.put("status", false);
+            return response;
+        }
+        Application a = applicationRepository.save(body);
+        response.put("status", true);
+//        response.put("application", a);
+        return response;
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
