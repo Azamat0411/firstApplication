@@ -1,9 +1,7 @@
 package com.example.firstapplication.controller;
 
 import com.example.firstapplication.model.Account;
-import com.example.firstapplication.model.Model;
 import com.example.firstapplication.repository.AccountRepository;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -15,10 +13,11 @@ public class AccountController {
     public AccountController(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
     }
+
     private final AccountRepository accountRepository;
 
     @GetMapping("/account")
-    public Map<String, Object> getAccounts(){
+    public Map<String, Object> getAccounts() {
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("status", true);
         response.put("account", accountRepository.findAll());
@@ -27,20 +26,20 @@ public class AccountController {
     }
 
     @GetMapping("/account/{id}")
-    public Map<String, Object> getAccount(@PathVariable(value = "id") Long id){
+    public Map<String, Object> getAccount(@PathVariable(value = "id") Long id) {
         Map<String, Object> response = new LinkedHashMap<>();
-        try{
+        try {
             Optional<Account> account = accountRepository.findById(id);
             response.put("status", account.isPresent());
-            if(account.isPresent()){
+            if (account.isPresent()) {
                 response.put("account", account);
                 response.put("error", "");
-            }else{
+            } else {
                 response.put("account", new HashMap<>());
                 response.put("error", "User not found");
             }
             return response;
-        }catch (Exception e){
+        } catch (Exception e) {
             response.put("status", false);
             response.put("account", new HashMap<>());
             response.put("error", "User found");
@@ -49,32 +48,121 @@ public class AccountController {
     }
 
     @PostMapping("/create-account")
-    public Model createAccount(@RequestBody Account body){
-        try{
+    public Map<String, Object> createAccount(@RequestBody Account body) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        try {
             boolean isDuplicate = false;
-            if(body == null){
-                return new Model(false, new HashMap<>(), "Body isn't null");
+            if (body == null) {
+                response.put("status", false);
+                response.put("account", new HashMap<>());
+                response.put("error", "Body isn't null");
+                return response;
             }
-            if(body.getUsername() == null){
-                return new Model(false, new HashMap<>(), "Username isn't null");
+            if (body.getUsername() == null) {
+                response.put("status", false);
+                response.put("account", new HashMap<>());
+                response.put("error", "Username isn't null");
+                return response;
             }
-            if(body.getPassword() == null){
-                return new Model(false, new HashMap<>(), "Password isn't null");
+            if (body.getPassword() == null) {
+                response.put("status", false);
+                response.put("account", new HashMap<>());
+                response.put("error", "Password isn't null");
+                return response;
             }
-            for(Account a:accountRepository.findAll()){
-                if(Objects.equals(a.getUsername(), body.getUsername())){
+            for (Account a : accountRepository.findAll()) {
+                if (Objects.equals(a.getUsername(), body.getUsername())) {
                     isDuplicate = true;
                     break;
                 }
             }
-            if(!isDuplicate){
+            if (!isDuplicate) {
                 Account account = accountRepository.save(new Account(body.getUsername(), body.getPassword()));
-                return new Model(true, account, "");
+                response.put("status", true);
+                response.put("account", account);
+                response.put("error", "");
+                return response;
             }
-            return new Model(false, new HashMap<>(), "Username is duplicate");
-        }catch (Exception e){
-            return new Model(false);
+            response.put("status", false);
+            response.put("account", new HashMap<>());
+            response.put("error", "Username is duplicate");
+            return response;
+        } catch (Exception e) {
+            response.put("status", false);
+            return response;
         }
+    }
 
+    @PutMapping("/account/{id}")
+    public Map<String, Object> updateAccount(@RequestBody Account body, @PathVariable(value = "id") Long id) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        try {
+            boolean isDuplicate = false;
+            if (body == null) {
+                response.put("status", false);
+                response.put("account", new HashMap<>());
+                response.put("error", "Body isn't null");
+                return response;
+            }
+            if (body.getUsername() == null) {
+                response.put("status", false);
+                response.put("account", new HashMap<>());
+                response.put("error", "Username isn't null");
+                return response;
+            }
+            if (body.getPassword() == null) {
+                response.put("status", false);
+                response.put("account", new HashMap<>());
+                response.put("error", "Password isn't null");
+                return response;
+            }
+            for (Account a : accountRepository.findAll()) {
+                if (Objects.equals(a.getUsername(), body.getUsername())) {
+                    isDuplicate = true;
+                    break;
+                }
+            }
+            Account account = accountRepository.findById(id).orElse(null);
+            if (account != null) {
+                if (!isDuplicate || body.getUsername().equals(account.getUsername())) {
+                    account.setUsername(body.getUsername());
+                    account.setPassword(body.getPassword());
+                    Account a = accountRepository.save(account);
+                    response.put("status", true);
+                    response.put("account", a);
+                    return response;
+                }
+                response.put("status", false);
+                response.put("error", "Username is duplicate");
+                return response;
+            }
+            response.put("status", false);
+            response.put("error", "User not found");
+            return response;
+        } catch (Exception e) {
+            response.put("status", false);
+            response.put("error", "User not found");
+            return response;
+        }
+    }
+
+    @DeleteMapping("/account/{id}")
+    public Map<String, Object> deleteAccount(@PathVariable(value = "id") Long id) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        try {
+            Account account = accountRepository.findById(id).orElse(null);
+            if (account != null) {
+                accountRepository.delete(account);
+                response.put("status", true);
+                return response;
+            }
+            response.put("status", false);
+            response.put("error", "User not found");
+            return response;
+        } catch (Exception e) {
+            response.put("status", false);
+            response.put("error", "User not found");
+            return response;
+        }
     }
 }
