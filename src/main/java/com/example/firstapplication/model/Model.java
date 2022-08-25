@@ -1,23 +1,25 @@
 package com.example.firstapplication.model;
-
-import java.util.List;
-
 public class Model {
-
-    public Model(){
-        super();
-    }
-
     public Model(Boolean status){
         this.status = status;
     }
 
-    public Model(Boolean status, Object list){
+    public Model(Boolean status, Object list, String error){
         this.status = status;
         this.list = list;
+        this.error = error;
     }
     private Boolean status;
     private Object list;
+
+    private String error;
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
 
     public Boolean getStatus() {
         return status;
@@ -31,7 +33,7 @@ public class Model {
         return list;
     }
 
-    public void setList(List list) {
+    public void setList(Object list) {
         this.list = list;
     }
 }
