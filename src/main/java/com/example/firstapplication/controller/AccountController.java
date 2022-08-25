@@ -5,9 +5,8 @@ import com.example.firstapplication.model.Model;
 import com.example.firstapplication.repository.AccountRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.Optional;
+
+import java.util.*;
 
 @RestController
 @RequestMapping("/api")
@@ -19,21 +18,34 @@ public class AccountController {
     private final AccountRepository accountRepository;
 
     @GetMapping("/account")
-    public Model getAccounts(){
-        return new Model(true, this.accountRepository.findAll(), "");
+    public Map<String, Object> getAccounts(){
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", true);
+        response.put("account", accountRepository.findAll());
+        response.put("error", "");
+        return response;
     }
 
     @GetMapping("/account/{id}")
-    public ResponseEntity<Model> getAccount(@PathVariable(value = "id") Long id){
+    public Map<String, Object> getAccount(@PathVariable(value = "id") Long id){
+        Map<String, Object> response = new LinkedHashMap<>();
         try{
             Optional<Account> account = accountRepository.findById(id);
-            Model model = account.isPresent()?new Model(true, account, ""):new Model(false, new HashMap<>(), "User not found");
-            return ResponseEntity.ok().body(model);
+            response.put("status", account.isPresent());
+            if(account.isPresent()){
+                response.put("account", account);
+                response.put("error", "");
+            }else{
+                response.put("account", new HashMap<>());
+                response.put("error", "User not found");
+            }
+            return response;
         }catch (Exception e){
-            System.out.println("error:" + e.getMessage());
-            return ResponseEntity.ok().body(new Model(false, new HashMap<>(), "User not found"));
+            response.put("status", false);
+            response.put("account", new HashMap<>());
+            response.put("error", "User found");
+            return response;
         }
-
     }
 
     @PostMapping("/create-account")
