@@ -195,8 +195,16 @@ public class AccountController {
         return response;
     }
 
+    @GetMapping("/openBudgetAccount")
+    public Map<String, Object> getOpenBudgetAccount(){
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("status", true);
+        response.put("accounts", openBudgetRepository.findAll());
+        return response;
+    }
+
     @GetMapping("/openBudgetAccount/{id}")
-    public Map<String, Object> getOpenBudgetAccount(@PathVariable(value = "id") Long id){
+    public Map<String, Object> getOpenBudgetAccountById(@PathVariable(value = "id") Long id){
         Map<String, Object> response = new LinkedHashMap<>();
         try {
             Optional<OpenBudgetAccount> account = openBudgetRepository.findById(id);
