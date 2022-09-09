@@ -7,7 +7,6 @@ import com.example.firstapplication.repository.AccountRepository;
 import com.example.firstapplication.repository.ApplicationRepository;
 import com.example.firstapplication.repository.OpenBudgetRepository;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.*;
 
 @RestController
@@ -189,7 +188,7 @@ public class AccountController {
             response.put("status", false);
             return response;
         }
-        Application a = applicationRepository.save(body);
+//        Application a = applicationRepository.save(body);
         response.put("status", true);
 //        response.put("application", a);
         return response;
@@ -221,6 +220,7 @@ public class AccountController {
             response.put("status", false);
             response.put("account", new HashMap<>());
             response.put("error", "User found");
+//            Optional<OpenBudgetAccount> account = openBudgetRepository.findById(id);
             return response;
         }
     }
@@ -229,48 +229,18 @@ public class AccountController {
     public Map<String, Object> updateOpenBudgetAccount(@RequestBody OpenBudgetAccount body, @PathVariable(value = "id") Long id) {
         Map<String, Object> response = new LinkedHashMap<>();
         try {
-//            boolean isDuplicate = false;
             if (body == null) {
                 response.put("status", false);
                 response.put("account", new HashMap<>());
                 response.put("error", "Body isn't null");
                 return response;
             }
-//            if (body.getId() == null) {
-//                response.put("status", false);
-//                response.put("account", new HashMap<>());
-//                response.put("error", "Username isn't null");
-//                return response;
-//            }
-//            if (body.getApplication() == null) {
-//                response.put("status", false);
-//                response.put("account", new HashMap<>());
-//                response.put("error", "Password isn't null");
-//                return response;
-//            }
-//            for (OpenBudgetAccount a : openBudgetRepository.findAll()) {
-//                if (Objects.equals(a.getId(), body.getUsername())) {
-//                    isDuplicate = true;
-//                    break;
-//                }
-//            }
             OpenBudgetAccount account = openBudgetRepository.findById(id).orElse(null);
             if (account != null) {
                 account.setApplication(body.getApplication());
                 openBudgetRepository.save(account);
                 response.put("status", true);
                 return response;
-//                if (body.getUsername().equals(account.getUsername())) {
-//                    account.setUsername(body.getUsername());
-//                    account.setPassword(body.getPassword());
-//                    Account a = accountRepository.save(account);
-//                    response.put("status", true);
-//                    response.put("account", a);
-//                    return response;
-//                }
-//                response.put("status", false);
-//                response.put("error", "Username is duplicate");
-//                return response;
             }
             response.put("status", false);
             response.put("error", "User not found");
@@ -294,7 +264,7 @@ public class AccountController {
             response.put("status", false);
             return response;
         }
-        OpenBudgetAccount a = openBudgetRepository.save(body);
+//        OpenBudgetAccount a = openBudgetRepository.save(body);
         response.put("status", true);
         return response;
     }
